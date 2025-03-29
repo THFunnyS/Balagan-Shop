@@ -1,0 +1,8 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="container mt-5">
+    <h1>Блог магазина</h1>
+    <div th:each="application:${applications}" class="alert alert-info mt-2">
+        <h3 th:text="${applications.FIO}"/>
+    </div>
+</div>
