@@ -1,4 +1,4 @@
-package com.balagan.Balagan_Shop.controllers;
+package com.balagan.balaganShop.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,6 +1,6 @@
-package repositories;
+package com.balagan.balaganShop.repositories;
 
-import models.Application;
+import com.balagan.balaganShop.models.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

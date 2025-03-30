@@ -1,8 +1,8 @@
-package models;
+package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name="Managers")
+@Table(name="managers")
 @Entity
 public class Manager {
     @Id

@@ -1,8 +1,8 @@
-package models;
+package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name="Type")
+@Table(name="type")
 @Entity
 public class Type {
     @Id

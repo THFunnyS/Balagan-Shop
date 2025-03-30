@@ -1,8 +1,8 @@
-package models;
+package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name="Size")
+@Table(name="size")
 @Entity
 public class Size {
     @Id

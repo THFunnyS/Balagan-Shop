@@ -1,13 +1,16 @@
-package models;
+package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name="Items")
+@Table(name="items")
 @Entity
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @ManyToOne
+    @JoinColumn(name = "composition_id") // Внешний ключ в таблице items
+    private CompositionOfApplication compositionOfApplication;
     private String name;
     private double value;
     @OneToOne
@@ -25,6 +28,14 @@ public class Item {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public CompositionOfApplication getCompositionOfApplication() {
+        return compositionOfApplication;
+    }
+
+    public void setCompositionOfApplication(CompositionOfApplication compositionOfApplication) {
+        this.compositionOfApplication = compositionOfApplication;
     }
 
     public String getName() {

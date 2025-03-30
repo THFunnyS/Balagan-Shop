@@ -1,15 +1,15 @@
-package models;
+package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name = "Applications")
+@Table(name = "applications")
 @Entity
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String FIO;
-    private int phone_number;
+    private String phoneNumber;
     private String telegram;
 
     @ManyToOne
@@ -32,12 +32,12 @@ public class Application {
         this.FIO = FIO;
     }
 
-    public int getPhone_number() {
-        return phone_number;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone_number(int phone_number) {
-        this.phone_number = phone_number;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getTelegram() {
