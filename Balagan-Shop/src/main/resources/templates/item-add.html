@@ -1,0 +1,13 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="container mt-5">
+    <h1>Добавление товара</h1>
+    <form action="/item/add" method="post">
+        <input type="text" name="name" placeholder="Название товара" class="form-control">
+        <input type="number" name="value" placeholder="Цена товара" class="form-control">
+        <input type="number" name="type_id" placeholder="Тип товара" class="form-control">
+        <input type="number" name="size_id" placeholder="Размер товара" class="form-control">
+        <input type="text" name="photo" placeholder="Фото товара" class="form-control">
+        <button type="submit" class="btn-thn-success">Добавить товар</button>
+    </form>
+</div>

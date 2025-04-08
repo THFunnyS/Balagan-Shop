@@ -2,31 +2,37 @@ package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name="items")
+import java.util.List;
+
+@Table(name="item")
 @Entity
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-    @ManyToOne
-    @JoinColumn(name = "composition_id") // Внешний ключ в таблице items
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @OneToOne
+    //@ManyToMany(mappedBy = "items", cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_composition") // Внешний ключ на CompositionOfApplication
     private CompositionOfApplication compositionOfApplication;
+
     private String name;
     private double value;
     @OneToOne
-    @JoinColumn(name="id_type")
+    @JoinColumn(name = "id_type")
     private Type type;
 
     @OneToOne
-    @JoinColumn(name="id_size")
+    @JoinColumn(name = "id_size")
     private Size size;
 
     private String photo;
-    public int getId() {
+
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -75,6 +81,17 @@ public class Item {
     }
 
     public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public Item() {
+    }
+
+    public Item(String name, double value, Type type, Size size, String photo) {
+        this.name = name;
+        this.value = value;
+        this.type = type;
+        this.size = size;
         this.photo = photo;
     }
 }

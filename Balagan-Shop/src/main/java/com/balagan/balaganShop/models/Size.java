@@ -6,9 +6,9 @@ import jakarta.persistence.*;
 @Entity
 public class Size {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int size;
+    private String size;
 
     public int getId() {
         return id;
@@ -18,11 +18,11 @@ public class Size {
         this.id = id;
     }
 
-    public int getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(String size) {
         this.size = size;
     }
 }

@@ -9,16 +9,18 @@ import java.util.List;
 @Entity
 public class CompositionOfApplication {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-     private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     @OneToOne
     @JoinColumn(name="id_application")
     private Application application;
     private int amount_of_items;
     private double value_of_composition;
 
-    @OneToMany(mappedBy = "compositionOfApplication", cascade = CascadeType.ALL)
-    private List<Item> items = new ArrayList<>();
+    //@ManyToMany(mappedBy = "compositionOfApplication", cascade = CascadeType.ALL)
+    @OneToOne
+    @JoinColumn(name = "id_item")
+    private Item items;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -42,11 +44,11 @@ public class CompositionOfApplication {
         this.value_of_composition = value_of_composition;
     }
 
-    public List<Item> getItems() {
+    public Item getItems() {
         return items;
     }
 
-    public void setItems(List<Item> items) {
+    public void setItems(Item items) {
         this.items = items;
     }
 }

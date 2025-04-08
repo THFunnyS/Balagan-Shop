@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 public class Application {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String FIO;
     private String phoneNumber;
