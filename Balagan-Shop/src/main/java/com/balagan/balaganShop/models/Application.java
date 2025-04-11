@@ -2,25 +2,27 @@ package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
 
-@Table(name = "applications")
+@Table(name = "application")
 @Entity
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
+    @Column(name = "fio")
     private String FIO;
+    @Column(name = "phonenumber")
     private String phoneNumber;
     private String telegram;
 
     @ManyToOne
-    @JoinColumn(name="id_manager")
+    @JoinColumn(name = "id_manager")
     private Manager manager;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -54,5 +56,13 @@ public class Application {
 
     public void setManager(Manager manager) {
         this.manager = manager;
+    }
+
+    public Application(){}
+
+    public Application(String FIO, String phoneNumber, String telegram){
+        this.FIO = FIO;
+        this.phoneNumber = phoneNumber;
+        this.telegram = telegram;
     }
 }

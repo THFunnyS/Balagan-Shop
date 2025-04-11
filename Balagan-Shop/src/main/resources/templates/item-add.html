@@ -1,5 +1,29 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавление и просмотр товаров</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .details {
+            display: none;
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+    </style>
+</head>
 <div class="container mt-5">
     <h1>Добавление товара</h1>
     <form action="/item/add" method="post">
@@ -10,4 +34,49 @@
         <input type="text" name="photo" placeholder="Фото товара" class="form-control">
         <button type="submit" class="btn-thn-success">Добавить товар</button>
     </form>
+
+    <h2 style="margin-top: 3rem;">Список товаров</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Тип</th>
+            <th>Размер</th>
+            <th>.</th>
+            <th>.</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}" th:onclick="|toggleDetails('details-' + ${item.id})|">
+            <td th:text="${item.name}"></td>
+            <td th:text="${item.value}"></td>
+            <td th:text="${item.type.type}"></td>
+            <td th:text="${item.size.size}"></td>
+            <td>
+                <a th:href="@{'/item/delete/' + ${item.id}}" class="btn btn-danger btn-sm">Удалить</a>
+            </td>
+            <td>
+                <a th:href="@{'/item/edit/' + ${item.id}}" class="btn btn-danger btn-sm">Редактировать</a>
+            </td>
+        </tr>
+        <tr th:each="item : ${items}" th:id="'details-' + ${item.id}" class="details">
+            <td colspan="4">
+                <strong>Фото:</strong> <span th:text="${item.photo}"></span><br/>
+                <strong>ID:</strong> <span th:text="${item.id}"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/">Назад</a>
 </div>
+
+<script>
+    function toggleDetails(id) {
+        const el = document.getElementById(id);
+        el.style.display = el.style.display === 'table-row' ? 'none' : 'table-row';
+    }
+</script>
+</body>
+</html>

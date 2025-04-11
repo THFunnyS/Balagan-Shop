@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Оформление заявки</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .cart {
+            margin-top: 2rem;
+            background: #f0f0f0;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h1>Добавление заявки</h1>
+    <form id="orderForm" action="/application/add" method="post" onsubmit="return submitForm()">
+        <input type="text" name="FIO" placeholder="ФИО" required><br>
+        <input type="text" name="phoneNumber" placeholder="Номер телефона" required><br>
+        <input type="text" name="telegram" placeholder="Телеграм"><br>
+
+        <input type="hidden" name="cartJson" id="cartJson" />
+
+        <div class="cart">
+            <h3>Корзина</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Кол-во</th>
+                    <th>Итого</th>
+                    <th>Действие</th>
+                </tr>
+                </thead>
+                <tbody id="cartTable"></tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3"><strong>Итоговая сумма:</strong></td>
+                    <td colspan="2" id="cartTotal">0</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <button type="submit" id="submitButton" disabled>Оформить заказ</button>
+    </form>
+
+    <h2 style="margin-top: 3rem;">Список товаров</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Тип</th>
+            <th>Размер</th>
+            <th>Добавить</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td th:text="${item.name}"></td>
+            <td th:text="${item.value}"></td>
+            <td th:text="${item.type.type}"></td>
+            <td th:text="${item.size.size}"></td>
+            <td>
+                <button onclick="addToCart([[${item.id}]], '[[${item.name}]]', [[${item.value}]])">В корзину</button>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let cart = [];
+
+    function addToCart(id, name, price) {
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.count += 1;
+        } else {
+            cart.push({id, name, price, count: 1});
+        }
+        updateCart();
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        updateCart();
+    }
+
+    function changeQuantity(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if (item) {
+            item.count += delta;
+            if (item.count <= 0) {
+                removeFromCart(id);
+            }
+        }
+        updateCart();
+    }
+
+    function updateCart() {
+        const cartTable = document.getElementById("cartTable");
+        const submitButton = document.getElementById("submitButton");
+        const cartTotal = document.getElementById("cartTotal");
+
+        cartTable.innerHTML = "";
+        let totalSum = 0;
+
+        cart.forEach(item => {
+            const itemTotal = item.price * item.count;
+            totalSum += itemTotal;
+
+            const row = `<tr>
+                <td>${item.name}</td>
+                <td>${item.price}</td>
+                <td>
+                    <button type="button" onclick="changeQuantity(${item.id}, -1)">-</button>
+                    ${item.count}
+                    <button type="button" onclick="changeQuantity(${item.id}, 1)">+</button>
+                </td>
+                <td>${itemTotal}</td>
+                <td><button type="button" onclick="removeFromCart(${item.id})">Удалить</button></td>
+            </tr>`;
+            cartTable.innerHTML += row;
+        });
+
+        cartTotal.textContent = totalSum;
+        submitButton.disabled = cart.length === 0;
+    }
+
+    function submitForm() {
+        const cartJsonField = document.getElementById("cartJson");
+        cartJsonField.value = JSON.stringify(cart);
+        return true;
+    }
+</script>
+</body>
+</html>

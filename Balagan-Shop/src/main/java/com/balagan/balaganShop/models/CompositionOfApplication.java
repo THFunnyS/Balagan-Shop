@@ -10,7 +10,7 @@ import java.util.List;
 public class CompositionOfApplication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     @OneToOne
     @JoinColumn(name="id_application")
     private Application application;
@@ -22,8 +22,8 @@ public class CompositionOfApplication {
     @JoinColumn(name = "id_item")
     private Item items;
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public Application getApplication() { return application; }
     public void setApplication(Application application) { this.application = application; }
