@@ -14,9 +14,9 @@ public class Application {
     private String phoneNumber;
     private String telegram;
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "id_manager")
-    private Manager manager;
+    private Manager manager;*/
 
     public Integer getId() {
         return id;
@@ -50,13 +50,13 @@ public class Application {
         this.telegram = telegram;
     }
 
-    public Manager getManager() {
+    /*public Manager getManager() {
         return manager;
     }
 
     public void setManager(Manager manager) {
         this.manager = manager;
-    }
+    }*/
 
     public Application(){}
 

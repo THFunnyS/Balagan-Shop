@@ -74,7 +74,11 @@
             <td th:text="${item.type.type}"></td>
             <td th:text="${item.size.size}"></td>
             <td>
-                <button onclick="addToCart([[${item.id}]], '[[${item.name}]]', [[${item.value}]])">В корзину</button>
+                <button type="button"
+                        class="addToCartBtn"
+                        th:attr="data-id=${item.id}, data-name=${item.name}, data-price=${item.value}">
+                    В корзину
+                </button>
 
             </td>
         </tr>
@@ -120,10 +124,11 @@
         let totalSum = 0;
 
         cart.forEach(item => {
-            const itemTotal = item.price * item.count;
-            totalSum += itemTotal;
+        const itemTotal = item.price * item.count;
+        totalSum += itemTotal;
 
-            const row = `<tr>
+            const row = `
+            <tr>
                 <td>${item.name}</td>
                 <td>${item.price}</td>
                 <td>
@@ -133,7 +138,8 @@
                 </td>
                 <td>${itemTotal}</td>
                 <td><button type="button" onclick="removeFromCart(${item.id})">Удалить</button></td>
-            </tr>`;
+            </tr>
+            `;
             cartTable.innerHTML += row;
         });
 
@@ -141,11 +147,23 @@
         submitButton.disabled = cart.length === 0;
     }
 
+
     function submitForm() {
         const cartJsonField = document.getElementById("cartJson");
         cartJsonField.value = JSON.stringify(cart);
         return true;
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".addToCartBtn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = parseInt(btn.getAttribute("data-id"));
+                const name = btn.getAttribute("data-name");
+                const price = parseFloat(btn.getAttribute("data-price"));
+                addToCart(id, name, price);
+            });
+        });
+    });
 </script>
 </body>
 </html>
