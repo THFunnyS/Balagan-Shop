@@ -19,11 +19,14 @@
             background: #f0f0f0;
             padding: 1rem;
         }
+        img {
+            max-height: 60px;
+        }
     </style>
 </head>
 <body>
 <div>
-    <h1>Добавление заявки</h1>
+    <h1>Оформление заявки</h1>
     <form id="orderForm" action="/application/add" method="post" onsubmit="return submitForm()">
         <input type="text" name="FIO" placeholder="ФИО" required><br>
         <input type="text" name="phoneNumber" placeholder="Номер телефона" required><br>
@@ -47,7 +50,7 @@
                 <tfoot>
                 <tr>
                     <td colspan="3"><strong>Итоговая сумма:</strong></td>
-                    <td colspan="2" id="cartTotal">0</td>
+                    <td colspan="2" id="cartTotal">0.00</td>
                 </tr>
                 </tfoot>
             </table>
@@ -56,10 +59,13 @@
         <button type="submit" id="submitButton" disabled>Оформить заказ</button>
     </form>
 
+    <a href="/">Назад</a>
+
     <h2 style="margin-top: 3rem;">Список товаров</h2>
     <table>
         <thead>
         <tr>
+            <th>Фото</th>
             <th>Название</th>
             <th>Цена</th>
             <th>Тип</th>
@@ -69,6 +75,7 @@
         </thead>
         <tbody>
         <tr th:each="item : ${items}">
+            <td><img th:src="@{${item.photo}}" alt="Фото"/></td>
             <td th:text="${item.name}"></td>
             <td th:text="${item.value}"></td>
             <td th:text="${item.type.type}"></td>
@@ -79,7 +86,6 @@
                         th:attr="data-id=${item.id}, data-name=${item.name}, data-price=${item.value}">
                     В корзину
                 </button>
-
             </td>
         </tr>
         </tbody>
@@ -124,29 +130,28 @@
         let totalSum = 0;
 
         cart.forEach(item => {
-        const itemTotal = item.price * item.count;
-        totalSum += itemTotal;
+            const itemTotal = item.price * item.count;
+            totalSum += itemTotal;
 
             const row = `
             <tr>
                 <td>${item.name}</td>
-                <td>${item.price}</td>
+                <td>${item.price.toFixed(2)}</td>
                 <td>
                     <button type="button" onclick="changeQuantity(${item.id}, -1)">-</button>
                     ${item.count}
                     <button type="button" onclick="changeQuantity(${item.id}, 1)">+</button>
                 </td>
-                <td>${itemTotal}</td>
+                <td>${itemTotal.toFixed(2)}</td>
                 <td><button type="button" onclick="removeFromCart(${item.id})">Удалить</button></td>
             </tr>
             `;
             cartTable.innerHTML += row;
         });
 
-        cartTotal.textContent = totalSum;
+        cartTotal.textContent = totalSum.toFixed(2);
         submitButton.disabled = cart.length === 0;
     }
-
 
     function submitForm() {
         const cartJsonField = document.getElementById("cartJson");

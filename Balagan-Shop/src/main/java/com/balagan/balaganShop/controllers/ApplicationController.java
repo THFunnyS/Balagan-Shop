@@ -1,8 +1,9 @@
 package com.balagan.balaganShop.controllers;
 
 import com.balagan.balaganShop.models.Application;
-import com.balagan.balaganShop.models.CompositionOfApplication;
+import com.balagan.balaganShop.models.Order;
 import com.balagan.balaganShop.models.Item;
+import com.balagan.balaganShop.models.OrderDetails;
 import com.balagan.balaganShop.repositories.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,13 +20,15 @@ public class ApplicationController {
     @Autowired
     private ApplicationRepo applicationRepo;
     @Autowired
-    private CompositionRepo compositionRepo;
+    private OrderRepo orderRepo;
     @Autowired
     private ItemRepo itemRepo;
     @Autowired
     private SizeRepo sizeRepo;
     @Autowired
     private TypeRepo typeRepo;
+    @Autowired
+    private OrderDetailsRepo orderDetailsRepo;
 
     // Показываем форму заявки и список товаров
     @GetMapping("/application/add")
@@ -74,12 +77,21 @@ public class ApplicationController {
             Application application = new Application(FIO, phoneNumber, telegram);
             applicationRepo.save(application);
 
-            // 2. Парсим корзину из JSON
-            ObjectMapper mapper = new ObjectMapper();
-            List<Map<String, Object>> cart = mapper.readValue(cartJson, new TypeReference<List<Map<String, Object>>>() {
-            });
+            // 2. Создаем заказ
+            Order order = new Order();
+            order.setApplication(application);
+            order.setAmount_of_items(0); // пока 0
+            order.setValue_of_order(0.0); // пока 0
+            orderRepo.save(order); // нужно сохранить, чтобы получить ID
 
-            // 3. Добавляем позиции в заявку
+            // 3. Парсим корзину из JSON
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, Object>> cart = mapper.readValue(cartJson, new TypeReference<>() {});
+
+            int totalItems = 0;
+            double totalValue = 0.0;
+
+            // 4. Добавляем позиции в заявку
             for (Map<String, Object> itemData : cart) {
                 int itemId = (int) itemData.get("id");
                 int count = (int) itemData.get("count");
@@ -87,16 +99,27 @@ public class ApplicationController {
                 Item item = itemRepo.findById(itemId).orElse(null);
                 if (item == null) continue;
 
-                CompositionOfApplication comp = new CompositionOfApplication();
-                comp.setApplication(application);
-                comp.setItems(item);
-                comp.setAmount_of_items(count);
-                comp.setValue_of_composition(item.getValue() * count);
+                for (int i = 0; i < count; i++) {
+                    OrderDetails details = new OrderDetails();
+                    details.setOrder(order);
+                    details.setItem(item);
+                    orderDetailsRepo.save(details);
+                }
 
-                compositionRepo.save(comp);
+                totalItems += count;
+                totalValue += item.getValue() * count;
             }
 
-            return "redirect:/shop";
+            // 4. Обновляем заказ с финальными данными
+            order.setAmount_of_items(totalItems);
+            order.setValue_of_order(totalValue);
+            orderRepo.save(order);
+
+            // 5. Привязываем заказ к заявке
+            application.setOrder(order);
+            applicationRepo.save(application);
+
+            return "redirect:/application/add";
 
         } catch (Exception e) {
             e.printStackTrace();

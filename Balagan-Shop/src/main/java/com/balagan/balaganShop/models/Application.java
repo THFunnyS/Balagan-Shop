@@ -1,7 +1,8 @@
 package com.balagan.balaganShop.models;
 
 import jakarta.persistence.*;
-
+import lombok.Getter;
+@Getter
 @Table(name = "application")
 @Entity
 public class Application {
@@ -14,36 +15,24 @@ public class Application {
     private String phoneNumber;
     private String telegram;
 
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
     /*@ManyToOne
     @JoinColumn(name = "id_manager")
     private Manager manager;*/
 
-    public Integer getId() {
-        return id;
-    }
-
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getFIO() {
-        return FIO;
     }
 
     public void setFIO(String FIO) {
         this.FIO = FIO;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getTelegram() {
-        return telegram;
     }
 
     public void setTelegram(String telegram) {
@@ -57,6 +46,10 @@ public class Application {
     public void setManager(Manager manager) {
         this.manager = manager;
     }*/
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 
     public Application(){}
 

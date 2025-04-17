@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Table(name="type")
 @Entity
-public class Type {
+public class Type { //drop и добавить просто стрингом
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
