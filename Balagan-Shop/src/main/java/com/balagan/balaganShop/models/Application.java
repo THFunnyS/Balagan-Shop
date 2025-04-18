@@ -15,8 +15,8 @@ public class Application {
     private String phoneNumber;
     private String telegram;
 
-    @OneToOne
-    @JoinColumn(name = "order_id")
+    @OneToOne(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JoinColumn(name = "order_id")
     private Order order;
 
     /*@ManyToOne

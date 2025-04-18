@@ -12,19 +12,23 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @OneToOne(mappedBy = "order")
-    //@JoinColumn(name = "application_id")
+    @OneToOne
+    @JoinColumn(name = "application_id")
     private Application application;
     private int amount_of_items;
     private double value_of_order;
 
-    @ManyToMany
+    /*@ManyToMany
     @JoinTable(
-            name = "order_items",
+            name = "orders_item",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
-    private List<Item> items;
+    private List<Item> items;*/
+
+    @Getter
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetails> orderDetails;
 
 
     public void setId(Integer id) { this.id = id; }
@@ -39,7 +43,11 @@ public class Order {
         this.value_of_order = value_of_order;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
+    public void setOrderDetails(List<OrderDetails> orderDetails) {
+        this.orderDetails = orderDetails;
     }
+
+    /*public void setItems(List<Item> items) {
+        this.items = items;
+    } */
 }

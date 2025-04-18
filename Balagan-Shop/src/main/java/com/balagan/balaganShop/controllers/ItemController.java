@@ -27,8 +27,6 @@ public class ItemController {
     private TypeRepo typeRepo;
     @GetMapping("/shop")
     public String shopMain(Model model){
-        //Iterable<Application> applications = applicationRepo.findAll();
-        //model.addAttribute("applications", applications);
         return "shop-main";
     }
 
@@ -39,12 +37,6 @@ public class ItemController {
         model.addAttribute("items", itemRepo.findAll());
         return "item-add";
     }
-    /*@GetMapping("/items")
-    public String showAllItems(Model model) {
-        Iterable<Item> items = itemRepo.findAll();
-        model.addAttribute("items", items);
-        return "item-add";
-    } */
 
     @PostMapping("/item/add")
     public String itemPostAdd(@RequestParam String name,
@@ -104,6 +96,6 @@ public class ItemController {
         item.setPhoto(photo);
 
         itemRepo.save(item);
-        return "redirect:/item/add"; // Перенаправляем обратно на страницу добавления товаров
+        return "redirect:/item/add";
     }
 }

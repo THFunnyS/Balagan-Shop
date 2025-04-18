@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование заявки</title>
+    <script>
+        let cart = [];
+
+        function renderCart() {
+            const cartTable = document.getElementById("cartTableBody");
+            cartTable.innerHTML = "";
+
+            cart.forEach((item, index) => {
+                cartTable.innerHTML += `
+                    <tr>
+                        <td><img src="${item.photo}" alt="Фото" style="height:50px"/></td>
+                        <td>${item.name}</td>
+                        <td>${item.price}</td>
+                        <td>${item.type}</td>
+                        <td>${item.size}</td>
+                        <td><button type="button" onclick="removeFromCart(${index})">Удалить</button></td>
+                    </tr>`;
+            });
+
+            document.getElementById("cartJson").value = JSON.stringify(
+                cart.reduce((acc, item) => {
+                    const existing = acc.find(i => i.id === item.id);
+                    if (existing) {
+                        existing.count++;
+                    } else {
+                        acc.push({ id: item.id, count: 1 });
+                    }
+                    return acc;
+                }, [])
+            );
+        }
+
+        function addToCart(btn) {
+            const item = {
+                id: parseInt(btn.getAttribute("data-id")),
+                name: btn.getAttribute("data-name"),
+                price: parseFloat(btn.getAttribute("data-price")),
+                photo: btn.getAttribute("data-photo"),
+                type: btn.getAttribute("data-type"),
+                size: btn.getAttribute("data-size")
+            };
+
+            cart.push(item);
+            renderCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function submitForm() {
+            renderCart();
+            return true;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".addToCartBtn").forEach(btn => {
+                btn.addEventListener("click", () => addToCart(btn));
+            });
+
+            // Инициализация из Thymeleaf
+            const initialCart = /*[[${orderDetailsJson}]]*/ '[]';
+            try {
+                const parsed = JSON.parse(initialCart);
+                parsed.forEach(orderDetail => {
+                    cart.push({
+                        id: orderDetail.item.id,
+                        name: orderDetail.item.name,
+                        price: orderDetail.item.value,
+                        photo: orderDetail.item.photo,
+                        type: orderDetail.item.type.type,
+                        size: orderDetail.item.size.size
+                    });
+                });
+            } catch (e) { console.error("Failed to load initial cart", e); }
+
+            renderCart();
+        });
+    </script>
+</head>
+<body>
+
+<form id="editForm" th:action="@{'/application/edit/' + ${application.id}}" method="post" onsubmit="return submitForm()">
+    <input type="text" name="FIO" th:value="${application.FIO}"><br>
+    <input type="text" name="phoneNumber" th:value="${application.phoneNumber}"><br>
+    <input type="text" name="telegram" th:value="${application.telegram}"><br>
+
+    <input type="hidden" name="cartJson" id="cartJson" />
+
+    <a href="/application/show">Назад</a>
+
+    <h2 style="margin-top: 3rem;">Корзина</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Фото</th>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Тип</th>
+            <th>Размер</th>
+            <th>Удалить</th>
+        </tr>
+        </thead>
+        <tbody id="cartTableBody"></tbody>
+    </table>
+
+    <h2 style="margin-top: 3rem;">Список товаров</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Фото</th>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Тип</th>
+            <th>Размер</th>
+            <th>Добавить</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td><img th:src="@{${item.photo}}" alt="Фото" style="height:50px"/></td>
+            <td th:text="${item.name}"></td>
+            <td th:text="${item.value}"></td>
+            <td th:text="${item.type.type}"></td>
+            <td th:text="${item.size.size}"></td>
+            <td>
+                <button type="button"
+                        class="addToCartBtn"
+                        th:attr="
+                            data-id='${item.id}',
+                            data-name='${item.name}',
+                            data-price='${item.value}',
+                            data-photo='${item.photo}',
+                            data-type='${item.type.type}',
+                            data-size='${item.size.size}'">
+                    В корзину
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button type="submit" id="submitButton">Сохранить изменения</button>
+</form>
+
+</body>
+</html>
