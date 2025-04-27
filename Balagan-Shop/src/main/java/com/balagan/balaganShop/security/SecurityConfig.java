@@ -23,8 +23,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll() // Разрешаем доступ к аутентификации
-                        .requestMatchers("/application/show", "/item/add").authenticated() // доступ к заявкам и товарам приватен
+                        .requestMatchers("/","/application/show", "/item/add",  "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll() // Разрешаем доступ к аутентификации
+                        //.requestMatchers("/application/show", "/item/add").hasRole("manager") // доступ к заявкам и товарам приватен
                         .anyRequest().permitAll() // Все остальные запросы - общие
                 )
                 .sessionManagement(session -> session

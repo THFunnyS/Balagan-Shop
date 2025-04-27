@@ -129,7 +129,9 @@ public class ApplicationController {
     @GetMapping("/application/show")
     public String showApplications(Model model) {
         List<Application> applications = applicationRepo.findAll();
+        List<Item> items = itemRepo.findAll();
         model.addAttribute("applications", applications);
+        model.addAttribute("items", items);
         return "application-show";
     }
 
@@ -146,9 +148,32 @@ public class ApplicationController {
                 .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
 
         List<Item> allItems = itemRepo.findAll();
+        List<OrderDetails> orderDetails = (List<OrderDetails>) orderDetailsRepo.findByOrder(application.getOrder());
+        if (orderDetails == null){
+            orderDetails = new ArrayList<>();
+        }
+
+        StringBuilder jsonBuilder = new StringBuilder("[");
+        for (int i = 0; i < orderDetails.size(); i++){
+            OrderDetails orD = orderDetails.get(i);
+            jsonBuilder.append("{")
+                    .append("\"item\": {")
+                    .append("\"id\": ").append(orD.getItem().getId()).append(",")
+                    .append("\"name\": \"").append(orD.getItem().getName()).append("\",")
+                    .append("\"value\": ").append(orD.getItem().getValue()).append(",")
+                    .append("\"photo\": \"").append(orD.getItem().getPhoto()).append("\",")
+                    .append("\"type\": \"").append(orD.getItem().getType().getType()).append("\",")
+                    .append("\"size\": \"").append(orD.getItem().getSize().getSize()).append("\"")
+                    .append("}")
+                    .append("}");
+            if (i != orderDetails.size() - 1) {
+                jsonBuilder.append(",");
+            }
+        }
+        jsonBuilder.append("]");
         model.addAttribute("application", application);
         model.addAttribute("items", allItems);
-        model.addAttribute("orderDetails", orderDetailsRepo.findByOrder(application.getOrder()));
+        model.addAttribute("orderDetailsJson", jsonBuilder.toString());
         return "application-edit";
     }
 

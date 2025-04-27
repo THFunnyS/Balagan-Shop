@@ -43,7 +43,7 @@ public class ManagerService {
             throw new RuntimeException("Неверный пароль");
         }
 
-        return jwtUtil.generateToken(login);
+        return jwtUtil.generateToken(login,"ROLE_" + manager.getRole());
     }
 
     public List<Manager> getAllUsers() {
