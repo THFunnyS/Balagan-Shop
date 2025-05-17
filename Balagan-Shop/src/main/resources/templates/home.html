@@ -1,29 +1,35 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title> th:text="${title}"</title>
+    <title th:text="${title}">Balagan Shop</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-    <p th:text="|Привет, ${title}!|" />
-    <a class="p-2 text-dark" href="/item/add">Добавить товар</a> <br>
-    <a class="p-2 text-dark" href="/application/add">Сделать заказ</a> <br>
-    <a class="p-2 text-dark" href="/application/show">Посмотреть заказы</a> <br>
+<p th:text="|Привет, ${title}!|"></p>
 
-    <script>
-        const jwt = localStorage.getItem("jwt");
-        if (jwt) {
-            document.write("<p>Вы вошли как менеджер.</p>");
-            document.write('<a href="#" onclick="logout()">Выйти</a>');
-        } else {
-            document.write("<p>Вы гость. <a href='/manager/login'>Войти</a></p>");
-        }
+<div id="menu">
+    <a class="p-2 text-dark" href="/application/add">Сделать заказ</a><br>
+</div>
+<div id="authStatus"></div>
 
-        function logout() {
-            localStorage.removeItem("jwt");
-            location.reload();
-        }
-    </script>
+<script>
+    const jwt = localStorage.getItem("jwt");
 
+   if (jwt) {
+       document.getElementById("menu").innerHTML += `
+           <a class="p-2 text-dark" href="/item/add">Добавить товар</a><br>
+           <a class="p-2 text-dark" href="/application/show">Посмотреть заказы</a><br>
+       `;
+   }
+
+   document.write(jwt
+       ? "<p>Вы вошли как менеджер.</p><a href='#' onclick='logout()'>Выйти</a>"
+       : "<p>Вы гость. <a href='/manager/login'>Войти</a></p>");
+
+   function logout() {
+       localStorage.removeItem("jwt");
+       location.reload();
+   }
+</script>
 </body>
 </html>
