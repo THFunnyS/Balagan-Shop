@@ -7,6 +7,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +44,20 @@ public class ApplicationController {
         model.addAttribute("selectedItems", selectedItems);
 
         return "application-add";
+    }
+    @GetMapping("/application/cards")
+    public String showApplicationCards(@RequestParam(defaultValue = "0") int page, Model model) {
+        int pageSize = 6;
+
+        Page<Item> itemPage = itemRepo.findAll(PageRequest.of(page, pageSize));
+        List<Application> applications = applicationRepo.findAll();
+
+        model.addAttribute("applications", applications);
+        model.addAttribute("items", itemPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", itemPage.getTotalPages());
+
+        return "application-cards";
     }
 
     // Добавить товар в корзину
@@ -117,7 +133,7 @@ public class ApplicationController {
             application.setOrder(order);
             applicationRepo.save(application);
 
-            return "redirect:/application/add";
+            return "redirect:/application/cards";
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,8 +25,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll()
-                        .requestMatchers("/item/**", "/application/**").hasAuthority("ROLE_MANAGER")
+                        .requestMatchers("/", "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**","/application/cards","/application/cards/**").permitAll()
+                        .requestMatchers("/item/add", "/application/show").hasAuthority("ROLE_MANAGER")
                         .anyRequest().authenticated()
                 )
                 // Вот здесь — настроена обработка ошибок авторизации и доступа:

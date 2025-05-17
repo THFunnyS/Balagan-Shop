@@ -1,53 +1,114 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
     <title>Редактировать товар</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+        .form-container {
+            max-width: 600px;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+            border: none;
+        }
+        .btn-black:hover, .btn-black:focus {
+            background-color: #222;
+            color: #fff;
+        }
+        label {
+            font-weight: 600;
+        }
+        img {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 3px;
+            background: #fff;
+        }
+        a.btn-back {
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a.btn-back:hover {
+            text-decoration: underline;
+            color: #222;
+        }
+    </style>
 </head>
 <body>
-<h2>Редактировать товар</h2>
-<form action="/item/edit/{{item.id}}" method="post">
-    <div>
-        <label for="name">Название товара:</label>
-        <input type="text" id="name" name="name" value="{{item.name}}" required>
-    </div>
 
-    <div>
-        <label for="value">Цена:</label>
-        <input type="number" id="value" name="value" step="0.01" value="{{item.value}}" required>
-    </div>
+<div class="form-container shadow-sm">
+    <h2 class="mb-4 text-center">Редактировать товар</h2>
+    <form th:action="@{/item/edit/{id}(id=${item.id})}" method="post" enctype="multipart/form-data" novalidate>
+        <div class="mb-3">
+            <label for="name" class="form-label">Название товара:</label>
+            <input type="text" id="name" name="name" th:value="${item.name}" class="form-control" required />
+        </div>
 
-    <div>
-        <label for="type_id">Тип товара:</label>
-        <select id="type_id" name="type_id" required>
-            <option value="" disabled>Выберите тип</option>
-            {% for type in types %}
-            <option value="{{type.id}}" {% if type.id == item.type.id %}selected{% endif %}>{{type.type}}</option>
-            {% endfor %}
-        </select>
-    </div>
+        <div class="mb-3">
+            <label for="value" class="form-label">Цена:</label>
+            <input type="number" id="value" name="value" step="0.01" th:value="${item.value}" class="form-control" required />
+        </div>
 
-    <div>
-        <label for="size_id">Размер товара:</label>
-        <select id="size_id" name="size_id" required>
-            <option value="" disabled>Выберите размер</option>
-            {% for size in sizes %}
-            <option value="{{size.id}}" {% if size.id == item.size.id %}selected{% endif %}>{{size.size}}</option>
-            {% endfor %}
-        </select>
-    </div>
+        <div class="mb-3">
+            <label for="type_id" class="form-label">Тип товара:</label>
+            <select id="type_id" name="type_id" class="form-select" required>
+                <option value="" disabled>Выберите тип</option>
+                <option th:each="type : ${types}"
+                        th:value="${type.id}"
+                        th:text="${type.type}"
+                        th:selected="${type.id == item.type.id}">
+                </option>
+            </select>
+        </div>
 
-    <div>
-        <label for="photo">Фото товара:</label>
-        <input type="text" id="photo" name="photo" value="{{item.photo}}" required>
-    </div>
+        <div class="mb-3">
+            <label for="size_id" class="form-label">Размер товара:</label>
+            <select id="size_id" name="size_id" class="form-select" required>
+                <option value="" disabled>Выберите размер</option>
+                <option th:each="size : ${sizes}"
+                        th:value="${size.id}"
+                        th:text="${size.size}"
+                        th:selected="${size.id == item.size.id}">
+                </option>
+            </select>
+        </div>
 
-    <div>
-        <button type="submit">Сохранить изменения</button>
-    </div>
-</form>
+        <div class="mb-3">
+            <label class="form-label">Текущее фото:</label><br/>
+            <img th:if="${item.photo != null}" th:src="@{'/uploads/' + ${item.photo}}" alt="Фото товара" style="max-width:150px; max-height:150px; object-fit:contain;" />
+            <span th:if="${item.photo == null}">Нет фото</span>
+        </div>
 
-<a href="/item/add">Назад</a>
+        <div class="mb-4">
+            <label for="photo" class="form-label">Загрузить новое фото (оставьте пустым, если не менять):</label>
+            <input type="file" id="photo" name="photo" accept="image/*" class="form-control" />
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-black btn-lg">Сохранить изменения</button>
+        </div>
+    </form>
+
+    <div class="mt-3 text-center">
+        <a th:href="@{/item/add}" class="btn-back">&larr; Назад</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle (Popper + JS) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
