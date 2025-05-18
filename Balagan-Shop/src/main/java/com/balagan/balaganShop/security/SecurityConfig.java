@@ -20,19 +20,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","/application/show", "/item/add",  "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll() // Разрешаем доступ к аутентификации
-                        //.requestMatchers("/application/show", "/item/add").hasRole("manager") // доступ к заявкам и товарам приватен
+                        .requestMatchers("/",  "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll() // Разрешаем доступ к аутентификации
+                        .requestMatchers("/application/show", "/item/add").hasAuthority("ROLE_MANAGER") // доступ к заявкам и товарам приватен
                         .anyRequest().permitAll() // Все остальные запросы - общие
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)// Не используем сессии
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout.disable())
+                .build();
     }
 
     @Bean

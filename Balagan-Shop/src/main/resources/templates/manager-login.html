@@ -6,7 +6,7 @@
 </head>
 <body>
 <h2>Вход</h2>
-<form id="loginForm">
+<form action="/manager/login" method="post">
     <label for="login">Логин:</label>
     <input type="text" id="login" name="login" required><br><br>
 
@@ -15,30 +15,7 @@
 
     <button type="submit">Войти</button>
 </form>
-
-<p id="errorMsg" style="color: red;"></p>
-
-<script>
-    document.getElementById("loginForm").addEventListener("submit", async function(e) {
-        e.preventDefault();
-        const login = document.getElementById("login").value;
-        const password = document.getElementById("password").value;
-
-        const response = await fetch("/api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ login, password })
-        });
-
-        if (response.ok) {
-            const token = await response.text();
-            localStorage.setItem("jwt", token);
-            window.location.href = "/"; // на главную после входа
-        } else {
-            const msg = await response.text();
-            document.getElementById("errorMsg").textContent = "Ошибка: " + msg;
-        }
-    });
-</script>
+<a href="/">Назад</a>
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
 </body>
 </html>

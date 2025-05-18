@@ -31,4 +31,15 @@ public class AuthController {
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7);
+            jwtUtil.blacklistToken(token);
+            return ResponseEntity.ok("Вы успешно вышли из системы");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка выхода: " + e.getMessage());
+        }
+    }
 }
