@@ -13,9 +13,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                          CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -23,9 +29,13 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/",  "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll() // Разрешаем доступ к аутентификации
+                        .requestMatchers("/", "/401", "/403", "application/add", "/manager/login", "/api/login", "/css/**", "/js/**","/api/auth/**").permitAll() // Разрешаем доступ к аутентификации
                         .requestMatchers("/application/show", "/item/add").hasAuthority("ROLE_MANAGER") // доступ к заявкам и товарам приватен
-                        .anyRequest().permitAll() // Все остальные запросы - общие
+                        .anyRequest().authenticated() // Все остальные запросы - общие
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)// Не используем сессии

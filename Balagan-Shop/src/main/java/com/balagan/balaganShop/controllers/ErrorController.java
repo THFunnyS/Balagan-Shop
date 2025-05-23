@@ -10,4 +10,9 @@ public class ErrorController {
     public String error403() {
         return "403"; // имя шаблона
     }
+
+    @GetMapping("/401")
+    public String error401(){
+        return  "401";
+    }
 }
