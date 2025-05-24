@@ -1,0 +1,184 @@
+body, html {
+            height: 100%;
+        }
+        .error-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        .error-code {
+            font-size: 10rem;
+            font-weight: 700;
+            color: #dc3545; /* Bootstrap danger */
+        }
+        .error-message {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #6c757d; /* Bootstrap secondary */
+        }
+        .icon {
+            font-size: 5rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+img {
+            max-height: 60px;
+        }
+
+.extracted-style-1 { height: 200px; width: 100%; }
+
+body {
+            background-color: #f8f9fa;
+            padding: 30px 15px;
+        }
+
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-black:hover, .btn-black:focus {
+            background-color: #222;
+            color: #fff;
+        }
+
+        img {
+            max-height: 50px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        table th, table td {
+            vertical-align: middle !important;
+        }
+
+        h2 {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"] {
+            max-width: 400px;
+        }
+
+        /* Чтобы кнопки в таблицах не растягивались */
+        .btn-sm {
+            padding: 0.25rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+body {
+            background-color: #f8f9fa;
+            padding: 30px 15px;
+        }
+
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-black:hover, .btn-black:focus {
+            background-color: #222;
+            color: #fff;
+        }
+
+        table {
+            cursor: pointer;
+        }
+
+        .order-details {
+            display: none;
+            background-color: #f9f9f9;
+        }
+
+        /* Убираем курсор pointer для кнопок и ссылок внутри строки */
+        tbody tr td a, tbody tr td button {
+            cursor: default;
+        }
+
+        a.btn-back {
+            color: #000;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 1.5rem;
+            display: inline-block;
+        }
+
+        a.btn-back:hover {
+            color: #222;
+            text-decoration: underline;
+        }
+
+.extracted-style-2 { cursor:pointer; }
+
+.details-row {
+            display: none;
+            background-color: #f8f9fa;
+        }
+        .clickable:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+        img {
+            max-height: 150px;
+        }
+
+body {
+            background-color: #f8f9fa;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+        .form-container {
+            max-width: 600px;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+            border: none;
+        }
+        .btn-black:hover, .btn-black:focus {
+            background-color: #222;
+            color: #fff;
+        }
+        label {
+            font-weight: 600;
+        }
+        img {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 3px;
+            background: #fff;
+        }
+        a.btn-back {
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a.btn-back:hover {
+            text-decoration: underline;
+            color: #222;
+        }
+
+.extracted-style-3 { max-width:150px; max-height:150px; object-fit:contain; }
+
+.extracted-style-4 { min-height: 100vh; }
+
+.extracted-style-5 { width: 100%; max-width: 400px; }

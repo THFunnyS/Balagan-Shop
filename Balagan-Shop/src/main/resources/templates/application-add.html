@@ -1,0 +1,183 @@
+<!DOCTYPE HTML>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Оформление заявки</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+<body class="bg-light">
+<div class="container my-5">
+<h1 class="mb-4 text-center fw-bold">Оформление заявки</h1>
+<form action="/application/add" class="shadow-sm p-4 bg-white rounded" id="orderForm" method="post" onsubmit="return submitForm()">
+<div class="row mb-3">
+<div class="col-md-6">
+<label class="form-label" for="FIO">ФИО</label>
+<input class="form-control" id="FIO" name="FIO" placeholder="ФИО" required="" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label" for="phoneNumber">Номер телефона</label>
+<input class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Номер телефона" required="" type="text"/>
+</div>
+</div>
+<div class="mb-4">
+<label class="form-label" for="telegram">Телеграм</label>
+<input class="form-control" id="telegram" name="telegram" placeholder="@username" type="text"/>
+</div>
+<input id="cartJson" name="cartJson" type="hidden">
+<div class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">
+<h5 class="mb-0">Корзина</h5>
+</div>
+<div class="card-body p-0">
+<div class="table-responsive">
+<table class="table table-striped align-middle mb-0">
+<thead class="table-dark">
+<tr>
+<th>Название</th>
+<th>Цена</th>
+<th>Кол-во</th>
+<th>Итого</th>
+<th>Действие</th>
+</tr>
+</thead>
+<tbody id="cartTable"></tbody>
+<tfoot class="table-light">
+<tr>
+<td class="text-end fw-bold" colspan="3">Итоговая сумма:</td>
+<td colspan="2" id="cartTotal">0.00</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+</div>
+<div class="d-flex justify-content-between">
+<div>
+<a class="btn btn-secondary" href="/application/cards">← Назад</a>
+</div>
+<div>
+<button class="btn btn-dark" disabled="" id="submitButton" type="submit">Оформить заказ</button>
+</div>
+</div>
+</input></form>
+</div>
+<!-- Модальное окно предупреждения (ЧЁРНОЕ) -->
+<div aria-hidden="true" aria-labelledby="warningModalLabel" class="modal fade" id="warningModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content bg-dark text-white border-light">
+<div class="modal-header border-0">
+<h5 class="modal-title" id="warningModalLabel">Ошибка заполнения</h5>
+<button aria-label="Закрыть" class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body" id="warningModalBody">
+<!-- Сообщение будет установлено через JS -->
+</div>
+<div class="modal-footer border-0">
+<button class="btn btn-outline-light" data-bs-dismiss="modal" type="button">Понятно</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+    let cart = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        cart = JSON.parse(localStorage.getItem('cart')) || [];
+        updateCart();
+    });
+
+    function updateCart() {
+        const cartTable = document.getElementById("cartTable");
+        const submitButton = document.getElementById("submitButton");
+        const cartTotal = document.getElementById("cartTotal");
+
+        cartTable.innerHTML = "";
+        let totalSum = 0;
+
+        cart.forEach(item => {
+            const itemTotal = item.price * item.count;
+            totalSum += itemTotal;
+
+            const row = `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-dark" onclick="changeQuantity(${item.id}, -1)">-</button>
+                            <span class="mx-2">${item.count}</span>
+                            <button type="button" class="btn btn-outline-dark" onclick="changeQuantity(${item.id}, 1)">+</button>
+                        </div>
+                    </td>
+                    <td>${itemTotal.toFixed(2)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">Удалить</button>
+                    </td>
+                </tr>
+            `;
+            cartTable.innerHTML += row;
+        });
+
+        cartTotal.textContent = totalSum.toFixed(2);
+        submitButton.disabled = cart.length === 0;
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCart();
+    }
+
+    function changeQuantity(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if (item) {
+            item.count += delta;
+            if (item.count <= 0) {
+                removeFromCart(id);
+            } else {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+        }
+        updateCart();
+    }
+
+    function showWarning(message) {
+    const modalBody = document.getElementById("warningModalBody");
+    modalBody.textContent = message;
+
+    const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
+    warningModal.show();
+}
+
+function submitForm() {
+    const FIO = document.getElementById("FIO").value.trim();
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    const telegram = document.getElementById("telegram").value.trim();
+    const phoneRegex = /^\d{10,}$/;
+
+    if (!FIO || !phoneNumber || !telegram) {
+        showWarning("Пожалуйста, заполните все поля.");
+        return false;
+    }
+
+    if (!phoneRegex.test(phoneNumber)) {
+        showWarning("Номер телефона должен содержать только цифры и быть не короче 10 символов.");
+        return false;
+    }
+
+    const cartJsonField = document.getElementById("cartJson");
+    cartJsonField.value = JSON.stringify(cart);
+    localStorage.removeItem('cart');
+
+    setTimeout(() => {
+        window.location.href = "/application/cards";
+    }, 200);
+
+    return true;
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Модальное окно предупреждения -->
+</body>
+</html>

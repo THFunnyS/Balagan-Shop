@@ -1,0 +1,37 @@
+version: "3.8" ##версия синтаксиса докера
+
+services: ##раздел контейнеров
+  db: #контейнер базы
+    image: postgres:latest #берем образ для контейнера это постгрес с последней версие
+    container_name: book_shop_1 #название контейнера
+    environment: #переменные передаваемые контейнеру постгрес для настройки бд
+      POSTGRES_DB: balagan #название бд
+      POSTGRES_USER: postgres #пользователь
+      POSTGRES_PASSWORD: 12032004 #пароль бд
+    ports: #порты бд один на комп слева другой на контейнер справа слева можно легко поменять справа тяжелее нужно будет в постргре менять версу и в апликейшн пропертис
+      - "5432:5432"
+    volumes: #спец область хранения в данном случае мы тут храним бд чтобы при пересборке билда она сохранялась
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - demo-network #это просто кастомная виртуальная сеть, в которой контейнеры твоего проекта
+
+  app: #контейнер приложения у нас бека и фронта
+    build: . #это инструкция собрать билд из докер файла
+    container_name: balagan_shop_1 #название контейнера
+    ports: # порты контейнера они 8080 потому что в спринге так по дефолту
+      - "8080:8080"
+#переброска порта приложения на хост
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/balagan
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12032004
+    depends_on:
+      - db
+    networks:
+      - demo-network
+
+volumes:
+  pgdata:
+
+networks:
+  demo-network:
