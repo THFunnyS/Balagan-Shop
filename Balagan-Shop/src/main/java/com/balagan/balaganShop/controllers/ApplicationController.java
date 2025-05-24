@@ -74,25 +74,7 @@ public class ApplicationController {
     /**
      * Добавление товара в корзину (сохраняется в сессии пользователя).
      */
-    @PostMapping("/cart/add")
-    public String addToCart(@RequestParam int itemId, HttpSession session) {
-        List<Integer> cart = (List<Integer>) session.getAttribute("cart");
-        if (cart == null) cart = new ArrayList<>();
-        if (!cart.contains(itemId)) cart.add(itemId);
-        session.setAttribute("cart", cart);
-        return "redirect:/application/add";
-    }
 
-    /**
-     * Удаление товара из корзины.
-     */
-    @PostMapping("/cart/remove")
-    public String removeFromCart(@RequestParam int itemId, HttpSession session) {
-        List<Integer> cart = (List<Integer>) session.getAttribute("cart");
-        if (cart != null) cart.removeIf(id -> id == itemId);
-        session.setAttribute("cart", cart);
-        return "redirect:/application/add";
-    }
 
     /**
      * Отправка заявки: создаётся Application, Order и OrderDetails.
