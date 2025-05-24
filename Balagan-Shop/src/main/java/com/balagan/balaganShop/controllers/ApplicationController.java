@@ -15,8 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * Контроллер для работы с заявками (Application),
+ * корзиной, заказами и отображением данных на страницах.
+ */
 @Controller
 public class ApplicationController {
+
+    // Внедрение зависимостей репозиториев для доступа к данным
     @Autowired
     private ApplicationRepo applicationRepo;
     @Autowired
@@ -30,29 +36,34 @@ public class ApplicationController {
     @Autowired
     private OrderDetailsRepo orderDetailsRepo;
 
-    // Показываем форму заявки и список товаров
+    /**
+     * Отображение формы добавления заявки и списка доступных товаров.
+     * Также загружаем данные из корзины пользователя (сессия).
+     */
     @GetMapping("/application/add")
     public String applicationAdd(Model model, HttpSession session){
         model.addAttribute("types", typeRepo.findAll());
         model.addAttribute("sizes", sizeRepo.findAll());
         model.addAttribute("items", itemRepo.findAll());
 
-        // Корзина из сессии
+        // Загружаем корзину из сессии, если есть
         List<Integer> cart = (List<Integer>) session.getAttribute("cart");
         if (cart == null) cart = new ArrayList<>();
-        List<Item> selectedItems = (List<Item>) itemRepo.findAllById(cart);
+        List<Item> selectedItems = itemRepo.findAllById(cart);
         model.addAttribute("selectedItems", selectedItems);
 
-        return "application-add";
+        return "application-add"; // возвращаем HTML-шаблон
     }
+
+    /**
+     * Отображение карточек заявок с товарами, постранично.
+     */
     @GetMapping("/application/cards")
     public String showApplicationCards(@RequestParam(defaultValue = "0") int page, Model model) {
         int pageSize = 6;
-
         Page<Item> itemPage = itemRepo.findAll(PageRequest.of(page, pageSize));
         List<Application> applications = applicationRepo.findAll();
 
-        model.addAttribute("applications", applications);
         model.addAttribute("items", itemPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", itemPage.getTotalPages());
@@ -60,7 +71,9 @@ public class ApplicationController {
         return "application-cards";
     }
 
-    // Добавить товар в корзину
+    /**
+     * Добавление товара в корзину (сохраняется в сессии пользователя).
+     */
     @PostMapping("/cart/add")
     public String addToCart(@RequestParam int itemId, HttpSession session) {
         List<Integer> cart = (List<Integer>) session.getAttribute("cart");
@@ -70,7 +83,9 @@ public class ApplicationController {
         return "redirect:/application/add";
     }
 
-    // Удалить товар из корзины
+    /**
+     * Удаление товара из корзины.
+     */
     @PostMapping("/cart/remove")
     public String removeFromCart(@RequestParam int itemId, HttpSession session) {
         List<Integer> cart = (List<Integer>) session.getAttribute("cart");
@@ -79,7 +94,10 @@ public class ApplicationController {
         return "redirect:/application/add";
     }
 
-    // Отправка заявки
+    /**
+     * Отправка заявки: создаётся Application, Order и OrderDetails.
+     * Данные о корзине приходят в виде JSON (cartJson).
+     */
     @PostMapping("/application/add")
     public String applicationPostAdd(@RequestParam String FIO,
                                      @RequestParam String phoneNumber,
@@ -87,29 +105,28 @@ public class ApplicationController {
                                      @RequestParam String cartJson,
                                      Model model) {
         try {
-            // Создаем заявку
+            // Создание и сохранение заявки
             Application application = new Application(FIO, phoneNumber, telegram);
             applicationRepo.save(application);
 
-            // Создаем заказ
+            // Создание и сохранение заказа
             Order order = new Order();
             order.setApplication(application);
-            order.setAmount_of_items(0); // пока 0
-            order.setValue_of_order(0.0); // пока 0
-            orderRepo.save(order); // нужно сохранить, чтобы получить ID
+            order.setAmount_of_items(0);
+            order.setValue_of_order(0.0);
+            orderRepo.save(order);
 
-            // Парсим корзину из JSON
+            // Парсинг корзины из JSON
             ObjectMapper mapper = new ObjectMapper();
             List<Map<String, Object>> cart = mapper.readValue(cartJson, new TypeReference<>() {});
 
             int totalItems = 0;
             double totalValue = 0.0;
 
-            // Добавляем позиции в заявку
+            // Добавляем детали заказа по каждому товару
             for (Map<String, Object> itemData : cart) {
                 int itemId = (int) itemData.get("id");
                 int count = (int) itemData.get("count");
-
                 Item item = itemRepo.findById(itemId).orElse(null);
                 if (item == null) continue;
 
@@ -124,12 +141,12 @@ public class ApplicationController {
                 totalValue += item.getValue() * count;
             }
 
-            // Обновляем заказ с финальными данными
+            // Обновляем заказ
             order.setAmount_of_items(totalItems);
             order.setValue_of_order(totalValue);
             orderRepo.save(order);
 
-            // Привязываем заказ к заявке
+            // Связываем заявку с заказом
             application.setOrder(order);
             applicationRepo.save(application);
 
@@ -141,7 +158,10 @@ public class ApplicationController {
             return "application-add";
         }
     }
-    //Вывод всех заявок
+
+    /**
+     * Показ всех заявок
+     */
     @GetMapping("/application/show")
     public String showApplications(Model model) {
         List<Application> applications = applicationRepo.findAll();
@@ -151,24 +171,31 @@ public class ApplicationController {
         return "application-show";
     }
 
-    //Удаление заявки
+    /**
+     * Удаление заявки по ID
+     */
     @GetMapping("/application/delete/{id}")
     public String deleteApplication(@PathVariable("id") int id) {
         applicationRepo.deleteById(id);
         return "redirect:/application/show";
     }
-    //Редактирование заявки
+
+    /**
+     * Отображение формы редактирования заявки
+     */
     @GetMapping("/application/edit/{id}")
     public String editItem(@PathVariable("id") int id, Model model){
         Application application = applicationRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
 
         List<Item> allItems = itemRepo.findAll();
-        List<OrderDetails> orderDetails = (List<OrderDetails>) orderDetailsRepo.findByOrder(application.getOrder());
+        List<OrderDetails> orderDetails = orderDetailsRepo.findByOrder(application.getOrder());
+
         if (orderDetails == null){
             orderDetails = new ArrayList<>();
         }
 
+        // Генерируем JSON, чтобы отобразить текущие позиции в заказе
         StringBuilder jsonBuilder = new StringBuilder("[");
         for (int i = 0; i < orderDetails.size(); i++){
             OrderDetails orD = orderDetails.get(i);
@@ -187,13 +214,16 @@ public class ApplicationController {
             }
         }
         jsonBuilder.append("]");
+
         model.addAttribute("application", application);
         model.addAttribute("items", allItems);
         model.addAttribute("orderDetailsJson", jsonBuilder.toString());
         return "application-edit";
     }
 
-    // POST для сохранения изменений заявки
+    /**
+     * Сохранение изменений в заявке после редактирования
+     */
     @PostMapping("/application/edit/{id}")
     public String updateApplication(@PathVariable("id") int id,
                                     @RequestParam String FIO,
@@ -204,7 +234,7 @@ public class ApplicationController {
         Application application = applicationRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Заявка не найдена"));
 
-        // Обновляем только если пришли новые значения
+        // Обновление полей, если они не пустые
         if (FIO != null && !FIO.isBlank()) application.setFIO(FIO);
         if (phoneNumber != null && !phoneNumber.isBlank()) application.setPhoneNumber(phoneNumber);
         if (telegram != null && !telegram.isBlank()) application.setTelegram(telegram);
@@ -213,19 +243,19 @@ public class ApplicationController {
         if (order == null){
             order = new Order();
             order.setApplication(application);
-            orderRepo.save(order); // Сохраняем сразу, чтобы получить ID для связей
+            orderRepo.save(order);
             application.setOrder(order);
         }
 
-        // Получаем текущие детали заказа
-        List<OrderDetails> existingDetails = (List<OrderDetails>) orderDetailsRepo.findByOrder(order);
+        // Получаем текущие детали заказа и группируем по itemId
+        List<OrderDetails> existingDetails = orderDetailsRepo.findByOrder(order);
         Map<Integer, List<OrderDetails>> existingMap = new HashMap<>();
         for (OrderDetails detail : existingDetails) {
             int itemId = detail.getItem().getId();
             existingMap.computeIfAbsent(itemId, k -> new ArrayList<>()).add(detail);
         }
 
-        // Парсим корзину
+        // Парсинг нового списка товаров из JSON
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String, Object>> cart = mapper.readValue(cartJson, new TypeReference<>() {});
 
@@ -238,7 +268,7 @@ public class ApplicationController {
             }
         }
 
-        // Синхронизируем
+        // Синхронизация старых и новых данных
         for (Map.Entry<Integer, Integer> entry : newCart.entrySet()) {
             int itemId = entry.getKey();
             int newCount = entry.getValue();
@@ -247,7 +277,7 @@ public class ApplicationController {
             int currentCount = currentList.size();
 
             if (newCount > currentCount) {
-                // Добавить недостающее количество
+                // Добавляем недостающие
                 Item item = itemRepo.findById(itemId).orElse(null);
                 if (item != null) {
                     for (int i = 0; i < newCount - currentCount; i++) {
@@ -258,21 +288,21 @@ public class ApplicationController {
                     }
                 }
             } else if (newCount < currentCount) {
-                // Удалить лишние
+                // Удаляем лишние
                 List<OrderDetails> toRemove = currentList.subList(0, currentCount - newCount);
                 orderDetailsRepo.deleteAll(toRemove);
             }
-            // Если количество одинаково — ничего не делаем
-            existingMap.remove(itemId); // удаляем из карты, оставшиеся потом удалим
+
+            existingMap.remove(itemId); // исключаем обработанные
         }
 
-        // Удаляем позиции, которых больше нет в новом списке
+        // Удаляем позиции, отсутствующие в новой корзине
         for (List<OrderDetails> toDelete : existingMap.values()) {
             orderDetailsRepo.deleteAll(toDelete);
         }
 
-        // Пересчёт итогов
-        List<OrderDetails> updatedDetails = (List<OrderDetails>) orderDetailsRepo.findByOrder(order);
+        // Пересчёт итоговой стоимости и количества
+        List<OrderDetails> updatedDetails = orderDetailsRepo.findByOrder(order);
         int totalItems = updatedDetails.size();
         double totalValue = updatedDetails.stream().mapToDouble(d -> d.getItem().getValue()).sum();
 
@@ -280,6 +310,7 @@ public class ApplicationController {
         order.setValue_of_order(totalValue);
         orderRepo.save(order);
         applicationRepo.save(application);
+
         return "redirect:/application/show";
     }
 }

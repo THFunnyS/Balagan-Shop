@@ -3,8 +3,6 @@ package com.balagan.balaganShop.controllers;
 
 import com.balagan.balaganShop.service.ManagerService;
 import com.balagan.balaganShop.util.JwtUtil;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,29 +21,25 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
+    public ResponseEntity<String> login(@RequestBody Map<String, String> data){
         try {
             String login = data.get("login");
             String password = data.get("password");
-
-            // 1. Аутентификация и получение токена
             String jwt = managerService.authenticate(login, password);
-
-            // 2. Создание куки
-            Cookie jwtCookie = new Cookie("jwt", jwt);
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(3600); // 1 час
-            // jwtCookie.setSecure(true); // включить в проде (для HTTPS)
-
-            // 3. Добавление куки в ответ
-            response.addCookie(jwtCookie);
-
-            // 4. Ответ
-            return ResponseEntity.ok("Успешный вход");
-
+            return ResponseEntity.ok(jwt);
         } catch (RuntimeException e) {
             return ResponseEntity.status(401).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7);
+            jwtUtil.blacklistToken(token);
+            return ResponseEntity.ok("Вы успешно вышли из системы");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка выхода: " + e.getMessage());
         }
     }
 }

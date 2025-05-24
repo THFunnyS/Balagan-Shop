@@ -1,77 +1,66 @@
 <!DOCTYPE HTML>
+
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Список товаров</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+<meta charset="utf-8"/>
+<title>Список товаров</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 <body class="bg-light">
-
 <!-- Навигационная панель -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
-    <div class="container d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <a href="/" class="btn btn-outline-dark me-3">Главная</a>
-            <a class="navbar-brand fw-bold mb-0 h1" href="#">Список товаров</a>
-        </div>
-        <a href="/application/add" class="btn btn-dark position-relative">
+<div class="container d-flex justify-content-between align-items-center">
+<div class="d-flex align-items-center">
+<a class="btn btn-outline-dark me-3" href="/">Главная</a>
+<a class="navbar-brand fw-bold mb-0 h1" href="#">Список товаров</a>
+</div>
+<a class="btn btn-dark position-relative" href="/application/add">
             🛒 Корзина
-            <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
                 0
             </span>
-        </a>
-    </div>
+</a>
+</div>
 </nav>
-
 <div class="container my-5">
-    <div class="row g-4">
-        <div class="col-sm-6 col-md-4 col-lg-4 col-xl-4 d-flex" th:each="item : ${items}">
-            <div class="card h-100 w-100 shadow-sm">
-                <img th:src="@{/uploads/{filename}(filename=${item.photo})}"
-                     class="card-img-top object-fit-cover"
-                     style="height: 200px; width: 100%;"
-                     alt="Фото товара">
-
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title" th:text="${item.name}"></h5>
-                    <p class="card-text mb-1">
-                        <strong>Цена:</strong> <span th:text="${item.value}"></span> ₽
+<div class="row g-4">
+<div class="col-sm-6 col-md-4 col-lg-4 col-xl-4 d-flex" th:each="item : ${items}">
+<div class="card h-100 w-100 shadow-sm">
+<img alt="Фото товара" class="card-img-top object-fit-cover extracted-style-1" th:src="@{/uploads/{filename}(filename=${item.photo})}"/>
+<div class="card-body d-flex flex-column">
+<h5 class="card-title" th:text="${item.name}"></h5>
+<p class="card-text mb-1">
+<strong>Цена:</strong> <span th:text="${item.value}"></span> ₽
                     </p>
-                    <p class="card-text mb-1">
-                        <strong>Тип:</strong> <span th:text="${item.type.type}"></span>
-                    </p>
-                    <p class="card-text mb-3">
-                        <strong>Размер:</strong> <span th:text="${item.size.size}"></span>
-                    </p>
-                    <button type="button"
-                            class="btn btn-dark mt-auto addToCartBtn"
-                            th:attr="data-id=${item.id}, data-name=${item.name}, data-price=${item.value}">
+<p class="card-text mb-1">
+<strong>Тип:</strong> <span th:text="${item.type.type}"></span>
+</p>
+<p class="card-text mb-3">
+<strong>Размер:</strong> <span th:text="${item.size.size}"></span>
+</p>
+<button class="btn btn-dark mt-auto addToCartBtn" th:attr="data-id=${item.id}, data-name=${item.name}, data-price=${item.value}" type="button">
                         В корзину
                     </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="d-flex justify-content-center mt-4">
-        <nav>
-            <ul class="pagination">
-                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                    <a class="page-link text-dark border-dark" th:href="@{/application/cards(page=${currentPage - 1})}">Назад</a>
-                </li>
-                <li class="page-item"
-                    th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    th:classappend="${i == currentPage} ? 'active bg-dark text-white border-dark'">
-                    <a class="page-link text-dark border-dark" th:href="@{/application/cards(page=${i})}" th:text="${i + 1}">1</a>
-                </li>
-                <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
-                    <a class="page-link text-dark border-dark" th:href="@{/application/cards(page=${currentPage + 1})}">Вперед</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
 </div>
-
+</div>
+</div>
+</div>
+<div class="d-flex justify-content-center mt-4">
+<nav>
+<ul class="pagination">
+<li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+<a class="page-link text-dark border-dark" th:href="@{/application/cards(page=${currentPage - 1})}">Назад</a>
+</li>
+<li class="page-item" th:classappend="${i == currentPage} ? 'active bg-dark text-white border-dark'" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+<a class="page-link text-dark border-dark" th:href="@{/application/cards(page=${i})}" th:text="${i + 1}">1</a>
+</li>
+<li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+<a class="page-link text-dark border-dark" th:href="@{/application/cards(page=${currentPage + 1})}">Вперед</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
 <!-- Скрипты -->
 <script>
     function addToCart(id, name, price) {
@@ -105,7 +94,6 @@
         updateCartCount();
     });
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

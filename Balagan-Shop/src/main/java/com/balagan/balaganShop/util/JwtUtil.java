@@ -13,15 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY;
+    private static String SECRET_KEY = null;
     private static final long EXPIRATION_MS = 3600000; // 1 час
-    private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
+    private static final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
 
     public JwtUtil(@Value("${jwt.secret}") String secretKey) {
         this.SECRET_KEY = secretKey;
     }
 
-    private SecretKey getSigningKey() {
+    private static SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -55,7 +55,7 @@ public class JwtUtil {
     }
 
 
-    public boolean validateToken(String token) {
+    public static boolean validateToken(String token) {
         try {
             if (isTokenBlacklisted(token)) {
                 return false;
@@ -75,7 +75,7 @@ public class JwtUtil {
     }
 
     // Проверка, не отозван ли токен
-    public boolean isTokenBlacklisted(String token) {
+    public static boolean isTokenBlacklisted(String token) {
         return blacklistedTokens.contains(token);
     }
 }
